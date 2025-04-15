@@ -3,6 +3,7 @@ import time
 import os
 from dotenv import load_dotenv
 from utils.audio_processor import process_input
+from utils.exporter import export_markdown_report, export_json_report
 from core.transcriber import transcribe_all
 from core.summarizer import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
@@ -190,7 +191,14 @@ if st.sidebar.button("🚀 Analyze Meeting", type="primary") and source_input:
 if "pipeline_result" in st.session_state:
     res = st.session_state["pipeline_result"]
 
-    st.markdown(f"## 📌 {res['title']}")
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.markdown(f"## 📌 {res['title']}")
+    with col2:
+        md_data = export_markdown_report(res)
+        json_data = export_json_report(res)
+        st.download_button("📥 Download Report (MD)", md_data, file_name="meeting_report.md", mime="text/markdown")
+        st.download_button("📊 Download Report (JSON)", json_data, file_name="meeting_report.json", mime="application/json")
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📋 Summary",
